@@ -110,6 +110,8 @@ CREATE TABLE `menu` (
   `NameOfFood` varchar(60) DEFAULT NULL,
   `DescriptionOfFood` varchar(255) DEFAULT NULL,
   KEY `Restaurant_ID` (`Restaurant_ID`),
+  KEY `fk_Food_ID` (`Food_ID`),
+  CONSTRAINT `fk_Food_ID` FOREIGN KEY (`Food_ID`) REFERENCES `restaurant` (`Food`),
   CONSTRAINT `menu_ibfk_1` FOREIGN KEY (`Restaurant_ID`) REFERENCES `restaurant` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -136,7 +138,8 @@ CREATE TABLE `restaurant` (
   `Street` varchar(50) DEFAULT NULL,
   `PhoneNumber` varchar(50) DEFAULT NULL,
   `Food` int DEFAULT NULL,
-  PRIMARY KEY (`ID`)
+  PRIMARY KEY (`ID`),
+  KEY `idx_Food` (`Food`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -158,4 +161,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-03-12 17:33:46
+-- Dump completed on 2024-03-12 22:16:40
