@@ -63,6 +63,7 @@ CREATE TABLE `couriers` (
   `patronymics` varchar(40) DEFAULT NULL,
   `expirience` varchar(10) NOT NULL,
   `type_of_courier` enum('walking','bicycling','by car') DEFAULT NULL,
+  `delivery_price` decimal(10,2) DEFAULT NULL,
   PRIMARY KEY (`courier_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -73,7 +74,7 @@ CREATE TABLE `couriers` (
 
 LOCK TABLES `couriers` WRITE;
 /*!40000 ALTER TABLE `couriers` DISABLE KEYS */;
-INSERT INTO `couriers` VALUES (1,123456,380963160709,'free','Максим','Максимович','Бурбон','1 year','walking');
+INSERT INTO `couriers` VALUES (1,1234567890,123456789,'free','Иван','Иванов','Иванович','3 года','bicycling',30.00);
 /*!40000 ALTER TABLE `couriers` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -163,7 +164,6 @@ CREATE TABLE `orders` (
 
 LOCK TABLES `orders` WRITE;
 /*!40000 ALTER TABLE `orders` DISABLE KEYS */;
-INSERT INTO `orders` VALUES (1,1,1,'2024-04-29','delivered',40124.00);
 /*!40000 ALTER TABLE `orders` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -251,4 +251,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-04-29 15:12:57
+-- Dump completed on 2024-04-30 16:56:14
