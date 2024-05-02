@@ -105,6 +105,7 @@ CREATE TABLE `menu` (
 
 LOCK TABLES `menu` WRITE;
 /*!40000 ALTER TABLE `menu` DISABLE KEYS */;
+INSERT INTO `menu` VALUES (1,1,1,8.99,'Pancakes'),(2,1,2,12.99,'Grilled Chicken Sandwich'),(3,2,3,15.99,'Spaghetti Carbonara'),(4,2,4,6.99,'Mozzarella Sticks'),(5,3,5,7.99,'Chocolate Lava Cake'),(6,3,6,2.49,'Soft Drink'),(7,4,7,9.99,'Caesar Salad'),(8,4,8,11.99,'Pesto Pasta'),(9,5,9,14.99,'Margherita Pizza'),(10,5,10,18.99,'California Roll'),(11,1,11,20.99,'Grilled Salmon'),(12,1,12,22.99,'Filet Mignon'),(13,2,13,5.99,'Fruit Salad'),(14,2,14,4.99,'Steamed Vegetables'),(15,3,15,3.49,'Croissant');
 /*!40000 ALTER TABLE `menu` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -133,6 +134,7 @@ CREATE TABLE `ordered_food` (
 
 LOCK TABLES `ordered_food` WRITE;
 /*!40000 ALTER TABLE `ordered_food` DISABLE KEYS */;
+INSERT INTO `ordered_food` VALUES (1,1,2),(1,3,1),(1,7,1);
 /*!40000 ALTER TABLE `ordered_food` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -164,6 +166,7 @@ CREATE TABLE `orders` (
 
 LOCK TABLES `orders` WRITE;
 /*!40000 ALTER TABLE `orders` DISABLE KEYS */;
+INSERT INTO `orders` VALUES (1,1,1,'2024-05-02','created',73.96);
 /*!40000 ALTER TABLE `orders` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -187,6 +190,7 @@ CREATE TABLE `position_types` (
 
 LOCK TABLES `position_types` WRITE;
 /*!40000 ALTER TABLE `position_types` DISABLE KEYS */;
+INSERT INTO `position_types` VALUES (1,'Breakfast'),(2,'Lunch'),(3,'Dinner'),(4,'Appetizer'),(5,'Dessert'),(6,'Beverage'),(7,'Salad'),(8,'Pasta'),(9,'Pizza'),(10,'Sushi'),(11,'Fish'),(12,'Meat'),(13,'Fruits'),(14,'Vegetables'),(15,'Bakery');
 /*!40000 ALTER TABLE `position_types` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -239,6 +243,7 @@ CREATE TABLE `restaraunts` (
 
 LOCK TABLES `restaraunts` WRITE;
 /*!40000 ALTER TABLE `restaraunts` DISABLE KEYS */;
+INSERT INTO `restaraunts` VALUES (1,'Main Street','Delicious Delights'),(2,'Elm Street','Tasty Treats'),(3,'Oak Street','Savory Eats'),(4,'Maple Street','Yummy Yums'),(5,'Pine Street','Trendy Tastes');
 /*!40000 ALTER TABLE `restaraunts` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -251,4 +256,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-04-30 16:56:14
+-- Dump completed on 2024-05-02 12:09:10
