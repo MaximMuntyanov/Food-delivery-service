@@ -77,6 +77,29 @@ LOCK TABLES `couriers` WRITE;
 INSERT INTO `couriers` VALUES (1,1234567890,123456789,'free','Иван','Иванов','Иванович','3 года','bicycling',30.00);
 /*!40000 ALTER TABLE `couriers` ENABLE KEYS */;
 UNLOCK TABLES;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `update_delivery_price` BEFORE INSERT ON `couriers` FOR EACH ROW BEGIN
+    IF NEW.type_of_courier = 'walking' THEN
+        SET NEW.delivery_price = 15.00; -- Установить цену доставки для пеших курьеров
+    ELSEIF NEW.type_of_courier = 'bicycling' THEN
+        SET NEW.delivery_price = 30.00; -- Установить цену доставки для курьеров на велосипеде
+    ELSEIF NEW.type_of_courier = 'by car' THEN
+        SET NEW.delivery_price = 45.00; -- Установить цену доставки для курьеров на автомобиле
+    END IF;
+END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 
 --
 -- Table structure for table `menu`
@@ -137,6 +160,46 @@ LOCK TABLES `ordered_food` WRITE;
 INSERT INTO `ordered_food` VALUES (1,1,2),(1,3,1),(1,7,1);
 /*!40000 ALTER TABLE `ordered_food` ENABLE KEYS */;
 UNLOCK TABLES;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `update_order_price` AFTER INSERT ON `ordered_food` FOR EACH ROW BEGIN
+    DECLARE total_price DECIMAL(10,2);
+    DECLARE delivery_price DECIMAL(10,2);
+    
+    -- Вычисляем стоимость доставки курьера только один раз за заказ
+    SELECT couriers.delivery_price
+    INTO delivery_price
+    FROM couriers
+    WHERE couriers.courier_id = (SELECT orders.couriers_id FROM orders WHERE orders.order_id = NEW.order_id)
+    LIMIT 1;
+    
+    -- Вычисляем общую сумму заказа (без стоимости доставки)
+    SELECT SUM(menu.price * ordered_food.count)
+    INTO total_price
+    FROM ordered_food
+    JOIN menu ON ordered_food.menu_position_id = menu.position_id
+    WHERE ordered_food.order_id = NEW.order_id;
+    
+    -- Добавляем стоимость доставки к общей сумме заказа
+    SET total_price = total_price + delivery_price;
+    
+    -- Обновляем сумму заказа в таблице orders
+    UPDATE orders
+    SET price = total_price
+    WHERE order_id = NEW.order_id;
+END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 
 --
 -- Table structure for table `orders`
@@ -169,6 +232,72 @@ LOCK TABLES `orders` WRITE;
 INSERT INTO `orders` VALUES (1,1,1,'2024-05-02','created',73.96);
 /*!40000 ALTER TABLE `orders` ENABLE KEYS */;
 UNLOCK TABLES;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `update_courier_status` AFTER INSERT ON `orders` FOR EACH ROW BEGIN
+    DECLARE courier_status VARCHAR(20);
+    
+    -- Проверяем статус заказа
+    IF NEW.status = 'delivered' THEN
+        SET courier_status = 'free';
+    ELSEIF NEW.status = 'in progress' THEN
+        SET courier_status = 'busy';
+	ELSEIF NEW.status = 'delivery' THEN
+		SET courier_status = 'delivering';
+    ELSE
+        SET courier_status = 'free';
+    END IF;
+    
+    -- Обновляем статус курьера
+    UPDATE couriers
+    SET status = courier_status
+    WHERE courier_id = NEW.couriers_id;
+END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `update_courier_status_after_update` AFTER UPDATE ON `orders` FOR EACH ROW BEGIN
+    DECLARE courier_status VARCHAR(20);
+    
+    -- Проверяем статус заказа
+    IF NEW.status = 'delivered' THEN
+        SET courier_status = 'free';
+    ELSEIF NEW.status = 'in progress' THEN
+        SET courier_status = 'busy';
+	ELSEIF NEW.status = 'delivery' THEN
+		SET courier_status = 'delivering';
+    ELSE
+        SET courier_status = 'free';
+    END IF;
+    
+    -- Обновляем статус курьера
+    UPDATE couriers
+    SET status = courier_status
+    WHERE courier_id = NEW.couriers_id;
+END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 
 --
 -- Table structure for table `position_types`
@@ -246,6 +375,14 @@ LOCK TABLES `restaraunts` WRITE;
 INSERT INTO `restaraunts` VALUES (1,'Main Street','Delicious Delights'),(2,'Elm Street','Tasty Treats'),(3,'Oak Street','Savory Eats'),(4,'Maple Street','Yummy Yums'),(5,'Pine Street','Trendy Tastes');
 /*!40000 ALTER TABLE `restaraunts` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Dumping events for database 'fooddeliveryservice'
+--
+
+--
+-- Dumping routines for database 'fooddeliveryservice'
+--
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -256,4 +393,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-05-02 12:09:10
+-- Dump completed on 2024-05-02 13:12:51
