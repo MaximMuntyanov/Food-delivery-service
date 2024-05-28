@@ -1,0 +1,12 @@
+[
+	{
+		"id_workshops" : 1,
+		"name" : "Workshop 1",
+		"address" : "Address 1"
+	},
+	{
+		"id_workshops" : 2,
+		"name" : "Workshop 2",
+		"address" : "Address 2"
+	}
+]
