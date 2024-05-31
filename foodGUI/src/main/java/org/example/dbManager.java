@@ -1,16 +1,8 @@
 package org.example;
-
-import java.awt.*;
 import java.sql.Connection;
 import org.example.couriers.Status;
 import org.example.couriers.TypeOfCourier;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Serializable;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.sql.*;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -138,7 +130,7 @@ public class dbManager
                 int client_id = resultSet.getInt("client_id");
                 int couriers_id = resultSet.getInt("couriers_id");
                 Date datetime = resultSet.getDate("datetime");
-                orders.Status status = orders.Status.valueOf(resultSet.getString("status").replace(" ", "_"));
+                orders.Status status = orders.Status.valueOf(resultSet.getString("status").replace("_", " "));
                 double price = resultSet.getDouble("price");
 
                 ordersList.add(new orders(order_id, client_id, couriers_id, datetime, status, price));
@@ -333,6 +325,383 @@ public class dbManager
         statement.close();
     }
 
+    public void updateClient(int clientId, String document, String name, String surname, String patronymics, String phoneNumber, String city, String street, String apartments) throws SQLException {
+        StringBuilder sql = new StringBuilder("UPDATE client SET ");
+        boolean firstField = true;
+
+        if (!document.isEmpty()) {
+            sql.append(firstField ? "" : ", ").append("document = ?");
+            firstField = false;
+        }
+        if (!name.isEmpty()) {
+            sql.append(firstField ? "" : ", ").append("name = ?");
+            firstField = false;
+        }
+        if (!surname.isEmpty()) {
+            sql.append(firstField ? "" : ", ").append("surname = ?");
+            firstField = false;
+        }
+        if (!patronymics.isEmpty()) {
+            sql.append(firstField ? "" : ", ").append("patronymics = ?");
+            firstField = false;
+        }
+        if (!phoneNumber.isEmpty()) {
+            sql.append(firstField ? "" : ", ").append("phone_number = ?");
+            firstField = false;
+        }
+        if (!city.isEmpty()) {
+            sql.append(firstField ? "" : ", ").append("City = ?");
+            firstField = false;
+        }
+        if (!street.isEmpty()) {
+            sql.append(firstField ? "" : ", ").append("Street = ?");
+            firstField = false;
+        }
+        if (!apartments.isEmpty()) {
+            sql.append(firstField ? "" : ", ").append("Apartments = ?");
+            firstField = false;
+        }
+        sql.append(" WHERE client_id = ?");
+
+        PreparedStatement statement = connection.prepareStatement(sql.toString());
+        int parameterIndex = 1;
+
+        if (!document.isEmpty()) {
+            statement.setInt(parameterIndex++, Integer.parseInt(document));
+        }
+        if (!name.isEmpty()) {
+            statement.setString(parameterIndex++, name);
+        }
+        if (!surname.isEmpty()) {
+            statement.setString(parameterIndex++, surname);
+        }
+        if (!patronymics.isEmpty()) {
+            statement.setString(parameterIndex++, patronymics);
+        }
+        if (!phoneNumber.isEmpty()) {
+            statement.setString(parameterIndex++, phoneNumber);
+        }
+        if (!city.isEmpty()) {
+            statement.setString(parameterIndex++, city);
+        }
+        if (!street.isEmpty()) {
+            statement.setString(parameterIndex++, street);
+        }
+        if (!apartments.isEmpty()) {
+            statement.setString(parameterIndex++, apartments);
+        }
+        statement.setInt(parameterIndex, clientId);
+
+        int rowsUpdated = statement.executeUpdate();
+        if (rowsUpdated > 0) {
+            System.out.println("Client with ID " + clientId + " was updated successfully!");
+        }
+        statement.close();
+    }
+
+    public void updateCourier(int courierId, Integer courierDocument, Long phone, String status, String name, String surname, String patronymics, String experience, String typeOfCourier, Double deliveryPrice) throws SQLException {
+        StringBuilder sql = new StringBuilder("UPDATE couriers SET ");
+        boolean firstField = true;
+
+        if (courierDocument != null) {
+            sql.append(firstField ? "" : ", ").append("courier_document = ?");
+            firstField = false;
+        }
+        if (phone != null) {
+            sql.append(firstField ? "" : ", ").append("phone = ?");
+            firstField = false;
+        }
+        if (status != null && !status.isEmpty()) {
+            sql.append(firstField ? "" : ", ").append("status = ?");
+            firstField = false;
+        }
+        if (name != null && !name.isEmpty()) {
+            sql.append(firstField ? "" : ", ").append("name = ?");
+            firstField = false;
+        }
+        if (surname != null && !surname.isEmpty()) {
+            sql.append(firstField ? "" : ", ").append("surname = ?");
+            firstField = false;
+        }
+        if (patronymics != null && !patronymics.isEmpty()) {
+            sql.append(firstField ? "" : ", ").append("patronymics = ?");
+            firstField = false;
+        }
+        if (experience != null && !experience.isEmpty()) {
+            sql.append(firstField ? "" : ", ").append("experience = ?");
+            firstField = false;
+        }
+        if (typeOfCourier != null && !typeOfCourier.isEmpty()) {
+            sql.append(firstField ? "" : ", ").append("type_of_courier = ?");
+            firstField = false;
+        }
+        if (deliveryPrice != null) {
+            sql.append(firstField ? "" : ", ").append("delivery_price = ?");
+            firstField = false;
+        }
+        sql.append(" WHERE courier_id = ?");
+
+        PreparedStatement statement = connection.prepareStatement(sql.toString());
+        int parameterIndex = 1;
+
+        if (courierDocument != null) {
+            statement.setInt(parameterIndex++, courierDocument);
+        }
+        if (phone != null) {
+            statement.setLong(parameterIndex++, phone);
+        }
+        if (status != null && !status.isEmpty()) {
+            statement.setString(parameterIndex++, status);
+        }
+        if (name != null && !name.isEmpty()) {
+            statement.setString(parameterIndex++, name);
+        }
+        if (surname != null && !surname.isEmpty()) {
+            statement.setString(parameterIndex++, surname);
+        }
+        if (patronymics != null && !patronymics.isEmpty()) {
+            statement.setString(parameterIndex++, patronymics);
+        }
+        if (experience != null && !experience.isEmpty()) {
+            statement.setString(parameterIndex++, experience);
+        }
+        if (typeOfCourier != null && !typeOfCourier.isEmpty()) {
+            statement.setString(parameterIndex++, typeOfCourier);
+        }
+        if (deliveryPrice != null) {
+            statement.setDouble(parameterIndex++, deliveryPrice);
+        }
+        statement.setInt(parameterIndex, courierId);
+
+        int rowsUpdated = statement.executeUpdate();
+        if (rowsUpdated > 0) {
+            System.out.println("Courier with ID " + courierId + " was updated successfully!");
+        }
+        statement.close();
+    }
+
+    public void updateMenu(int positionId, Integer restarauntsId, Integer positionTypesId, Double price, String foodName) throws SQLException {
+        StringBuilder sql = new StringBuilder("UPDATE menu SET ");
+        boolean firstField = true;
+
+        if (restarauntsId != null) {
+            sql.append(firstField ? "" : ", ").append("restaraunts_id = ?");
+            firstField = false;
+        }
+        if (positionTypesId != null) {
+            sql.append(firstField ? "" : ", ").append("position_types_id = ?");
+            firstField = false;
+        }
+        if (price != null) {
+            sql.append(firstField ? "" : ", ").append("price = ?");
+            firstField = false;
+        }
+        if (foodName != null && !foodName.isEmpty()) {
+            sql.append(firstField ? "" : ", ").append("food_name = ?");
+            firstField = false;
+        }
+        sql.append(" WHERE position_id = ?");
+
+        PreparedStatement statement = connection.prepareStatement(sql.toString());
+        int parameterIndex = 1;
+
+        if (restarauntsId != null) {
+            statement.setInt(parameterIndex++, restarauntsId);
+        }
+        if (positionTypesId != null) {
+            statement.setInt(parameterIndex++, positionTypesId);
+        }
+        if (price != null) {
+            statement.setDouble(parameterIndex++, price);
+        }
+        if (foodName != null && !foodName.isEmpty()) {
+            statement.setString(parameterIndex++, foodName);
+        }
+        statement.setInt(parameterIndex, positionId);
+
+        int rowsUpdated = statement.executeUpdate();
+        if (rowsUpdated > 0) {
+            System.out.println("Menu item with ID " + positionId + " was updated successfully!");
+        }
+        statement.close();
+    }
+
+    public void updateOrderedFood(int orderId, Integer menuPositionId, Integer count) throws SQLException {
+        StringBuilder sql = new StringBuilder("UPDATE ordered_food SET ");
+        boolean firstField = true;
+
+        if (menuPositionId != null) {
+            sql.append(firstField ? "" : ", ").append("menu_position_id = ?");
+            firstField = false;
+        }
+        if (count != null) {
+            sql.append(firstField ? "" : ", ").append("count = ?");
+            firstField = false;
+        }
+        sql.append(" WHERE order_id = ?");
+
+        PreparedStatement statement = connection.prepareStatement(sql.toString());
+        int parameterIndex = 1;
+
+        if (menuPositionId != null) {
+            statement.setInt(parameterIndex++, menuPositionId);
+        }
+        if (count != null) {
+            statement.setInt(parameterIndex++, count);
+        }
+        statement.setInt(parameterIndex, orderId);
+
+        int rowsUpdated = statement.executeUpdate();
+        if (rowsUpdated > 0) {
+            System.out.println("Ordered food with Order ID " + orderId + " was updated successfully!");
+        }
+        statement.close();
+    }
+
+    public void updateOrder(int orderId, Integer clientId, Integer couriersId, java.sql.Date datetime, String status, Double price) throws SQLException {
+        StringBuilder sql = new StringBuilder("UPDATE orders SET ");
+        boolean firstField = true;
+
+        if (clientId != null) {
+            sql.append(firstField ? "" : ", ").append("client_id = ?");
+            firstField = false;
+        }
+        if (couriersId != null) {
+            sql.append(firstField ? "" : ", ").append("couriers_id = ?");
+            firstField = false;
+        }
+        if (datetime != null) {
+            sql.append(firstField ? "" : ", ").append("datetime = ?");
+            firstField = false;
+        }
+        if (status != null && !status.isEmpty()) {
+            sql.append(firstField ? "" : ", ").append("status = ?");
+            firstField = false;
+        }
+        if (price != null) {
+            sql.append(firstField ? "" : ", ").append("price = ?");
+            firstField = false;
+        }
+        sql.append(" WHERE order_id = ?");
+
+        PreparedStatement statement = connection.prepareStatement(sql.toString());
+        int parameterIndex = 1;
+
+        if (clientId != null) {
+            statement.setInt(parameterIndex++, clientId);
+        }
+        if (couriersId != null) {
+            statement.setInt(parameterIndex++, couriersId);
+        }
+        if (datetime != null) {
+            statement.setDate(parameterIndex++, datetime);
+        }
+        if (status != null && !status.isEmpty()) {
+            statement.setString(parameterIndex++, status);
+        }
+        if (price != null) {
+            statement.setDouble(parameterIndex++, price);
+        }
+        statement.setInt(parameterIndex, orderId);
+
+        int rowsUpdated = statement.executeUpdate();
+        if (rowsUpdated > 0) {
+            System.out.println("Order with ID " + orderId + " was updated successfully!");
+        }
+        statement.close();
+    }
+
+    public void updatePositionType(int positionTypeId, String foodType) throws SQLException {
+        String sql = "UPDATE position_types SET food_type = ? WHERE position_type_id = ?";
+        PreparedStatement statement = connection.prepareStatement(sql);
+        statement.setString(1, foodType);
+        statement.setInt(2, positionTypeId);
+
+        int rowsUpdated = statement.executeUpdate();
+        if (rowsUpdated > 0) {
+            System.out.println("Position type with ID " + positionTypeId + " was updated successfully!");
+        }
+        statement.close();
+    }
+    public void updateReport(int orderId, Date complDatetime, Short grade, String commentCl, String result) throws SQLException {
+        StringBuilder sql = new StringBuilder("UPDATE reports SET ");
+        boolean firstField = true;
+
+        if (complDatetime != null) {
+            sql.append(firstField ? "" : ", ").append("compl_datetime = ?");
+            firstField = false;
+        }
+        if (grade != null) {
+            sql.append(firstField ? "" : ", ").append("grade = ?");
+            firstField = false;
+        }
+        if (commentCl != null && !commentCl.isEmpty()) {
+            sql.append(firstField ? "" : ", ").append("comment_cl = ?");
+            firstField = false;
+        }
+        if (result != null && !result.isEmpty()) {
+            sql.append(firstField ? "" : ", ").append("result = ?");
+            firstField = false;
+        }
+        sql.append(" WHERE order_id = ?");
+
+        PreparedStatement statement = connection.prepareStatement(sql.toString());
+        int parameterIndex = 1;
+
+        if (complDatetime != null) {
+            statement.setDate(parameterIndex++, complDatetime);
+        }
+        if (grade != null) {
+            statement.setShort(parameterIndex++, grade);
+        }
+        if (commentCl != null && !commentCl.isEmpty()) {
+            statement.setString(parameterIndex++, commentCl);
+        }
+        if (result != null && !result.isEmpty()) {
+            statement.setString(parameterIndex++, result);
+        }
+        statement.setInt(parameterIndex, orderId);
+
+        int rowsUpdated = statement.executeUpdate();
+        if (rowsUpdated > 0) {
+            System.out.println("Report with Order ID " + orderId + " was updated successfully!");
+        }
+        statement.close();
+    }
+
+    public void updateRestaraunt(int restarauntId, String address, String name) throws SQLException {
+        StringBuilder sql = new StringBuilder("UPDATE restaraunts SET ");
+        boolean firstField = true;
+
+        if (address != null && !address.isEmpty()) {
+            sql.append(firstField ? "" : ", ").append("address = ?");
+            firstField = false;
+        }
+        if (name != null && !name.isEmpty()) {
+            sql.append(firstField ? "" : ", ").append("name = ?");
+            firstField = false;
+        }
+        sql.append(" WHERE restaraunt_id = ?");
+
+        PreparedStatement statement = connection.prepareStatement(sql.toString());
+        int parameterIndex = 1;
+
+        if (address != null && !address.isEmpty()) {
+            statement.setString(parameterIndex++, address);
+        }
+        if (name != null && !name.isEmpty()) {
+            statement.setString(parameterIndex++, name);
+        }
+        statement.setInt(parameterIndex, restarauntId);
+
+        int rowsUpdated = statement.executeUpdate();
+        if (rowsUpdated > 0) {
+            System.out.println("Restaurant with ID " + restarauntId + " was updated successfully!");
+        }
+        statement.close();
+    }
+
+
 
     public void deleteClient(int clientId) throws SQLException {
         String sql = "DELETE FROM client WHERE client_id = ?";
@@ -346,15 +715,22 @@ public class dbManager
     }
 
     public void deleteCourier(int courierId) throws SQLException {
-        String sql = "DELETE FROM couriers WHERE courier_id = ?";
-        PreparedStatement statement = connection.prepareStatement(sql);
-        statement.setInt(1, courierId);
-        int rowsDeleted = statement.executeUpdate();
-        if (rowsDeleted > 0) {
-            System.out.println("Courier with ID " + courierId + " was deleted successfully!");
+        String deleteOrdersSql = "DELETE FROM orders WHERE couriers_id = ?";
+        try (PreparedStatement deleteOrdersStmt = connection.prepareStatement(deleteOrdersSql)) {
+            deleteOrdersStmt.setInt(1, courierId);
+            deleteOrdersStmt.executeUpdate();
         }
-        statement.close();
+
+        String deleteCourierSql = "DELETE FROM couriers WHERE courier_id = ?";
+        try (PreparedStatement deleteCourierStmt = connection.prepareStatement(deleteCourierSql)) {
+            deleteCourierStmt.setInt(1, courierId);
+            int rowsDeleted = deleteCourierStmt.executeUpdate();
+            if (rowsDeleted > 0) {
+                System.out.println("Courier with ID " + courierId + " was deleted successfully!");
+            }
+        }
     }
+
 
     public void deleteMenuItem(int positionId) throws SQLException {
         String sql = "DELETE FROM menu WHERE position_id = ?";
@@ -367,14 +743,14 @@ public class dbManager
         statement.close();
     }
 
-    public void deleteOrderedFood(int orderId, int menuPositionId) throws SQLException {
-        String sql = "DELETE FROM ordered_food WHERE order_id = ? AND menu_position_id = ?";
+    public void deleteOrderedFood(int orderId) throws SQLException {
+        String sql = "DELETE FROM ordered_food WHERE order_id = ?";
         PreparedStatement statement = connection.prepareStatement(sql);
         statement.setInt(1, orderId);
-        statement.setInt(2, menuPositionId);
+
         int rowsDeleted = statement.executeUpdate();
         if (rowsDeleted > 0) {
-            System.out.println("Ordered food with Order ID " + orderId + " and Menu Position ID " + menuPositionId + " was deleted successfully!");
+            System.out.println("Ordered food with Order ID " + orderId +  "was deleted successfully!");
         }
         statement.close();
     }
@@ -419,5 +795,22 @@ public class dbManager
             System.out.println("Restaraunt with ID " + restarauntId + " was deleted successfully!");
         }
         statement.close();
+    }
+
+    public void isDelivered(int orderId, int courierId) throws SQLException
+    {
+        String sql = "UPDATE orders SET status = 'delivered' WHERE order_id = ? AND couriers_id = ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, orderId);
+            statement.setInt(2, courierId);
+
+            int rowsUpdated = statement.executeUpdate();
+            if (rowsUpdated > 0) {
+                System.out.println("Order with ID " + orderId + " and courier ID " + courierId + " was marked as delivered.");
+            } else {
+                System.out.println("No order found with ID " + orderId + " for courier ID " + courierId + ".");
+            }
+        }
     }
 }
