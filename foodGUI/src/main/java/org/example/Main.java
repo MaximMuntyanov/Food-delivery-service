@@ -618,7 +618,7 @@ public class Main extends Application
         String surname = surnameField.getText();
         String patronymics = patronymicsField.getText();
         String experience = experienceField.getText();
-        TypeOfCourier typeOfCourier = TypeOfCourier.valueOf(typeOfCourierComboBox.getValue());
+        String typeOfCourier = typeOfCourierComboBox.getValue();
         double deliveryPrice = Double.parseDouble(deliveryPriceField.getText());
 
         if (!name.isEmpty() && !surname.isEmpty() && !patronymics.isEmpty() && !experience.isEmpty() && status != null && typeOfCourier != null) {
@@ -789,13 +789,13 @@ public class Main extends Application
         gridPane.add(new Label("Courier ID:"), 0, 2);
         gridPane.add(couriersIdField, 1, 2);
 
-        TextField datetimeField = new TextField();
-        datetimeField.setPromptText("Enter datetime (YYYY-MM-DD)");
-        gridPane.add(new Label("Datetime:"), 0, 3);
-        gridPane.add(datetimeField, 1, 3);
+        DatePicker datetimePicker = new DatePicker();
+        datetimePicker.setPromptText("Select Date");
+        gridPane.add(new Label("Date:"), 0, 3);
+        gridPane.add(datetimePicker, 1, 3);
 
         ChoiceBox<String> statusChoiceBox = new ChoiceBox<>();
-        statusChoiceBox.getItems().addAll("created", "delivery", "in progress", "delivered");
+        statusChoiceBox.getItems().addAll("created", "delivery", "in_progress", "delivered");
         statusChoiceBox.setValue("created");
         gridPane.add(new Label("Status:"), 0, 4);
         gridPane.add(statusChoiceBox, 1, 4);
@@ -808,33 +808,51 @@ public class Main extends Application
         Button addButton = new Button("Add");
         addButton.setOnAction(e -> {
             try {
-                int orderId = Integer.parseInt(orderIdField.getText());
-                int clientId = Integer.parseInt(clientIdField.getText());
-                int couriersId = Integer.parseInt(couriersIdField.getText());
-                java.sql.Date datetime = java.sql.Date.valueOf(datetimeField.getText());
-                String status = statusChoiceBox.getValue();
-                double price = Double.parseDouble(priceField.getText());
-
-                if (!datetime.toString().isEmpty() && !status.isEmpty() && price >= 0) {
-                    try {
-                        dbFoodAPP.insertOrder(orderId, clientId, couriersId, datetime, status, price);
-                    } catch (SQLException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                    orders.setAll(dbFoodAPP.getAllOrders());
-                    insertOrdersStage.close();
-                } else {
+                if (orderIdField.getText().isEmpty() || clientIdField.getText().isEmpty() || couriersIdField.getText().isEmpty() || priceField.getText().isEmpty()) {
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Input Error");
                     alert.setHeaderText(null);
                     alert.setContentText("Please fill in all fields correctly.");
                     alert.showAndWait();
+                    return;
                 }
+
+                int orderId = Integer.parseInt(orderIdField.getText());
+                int clientId = Integer.parseInt(clientIdField.getText());
+                int couriersId = Integer.parseInt(couriersIdField.getText());
+                java.sql.Date complDatetime = datetimePicker.getValue() != null ? java.sql.Date.valueOf(datetimePicker.getValue()) : null;
+                String status = statusChoiceBox.getValue();
+                double price = Double.parseDouble(priceField.getText());
+
+                if (complDatetime == null) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Input Error");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Invalid date format. Please use the date picker to select a date.");
+                    alert.showAndWait();
+                    return;
+                }
+
+                dbFoodAPP.insertOrder(orderId, clientId, couriersId, complDatetime, status, price);
+                orders.setAll(dbFoodAPP.getAllOrders());
+                insertOrdersStage.close();
+            } catch (NumberFormatException ex) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Input Error");
+                alert.setHeaderText(null);
+                alert.setContentText("Please ensure all numerical fields contain valid numbers.");
+                alert.showAndWait();
+            } catch (SQLException ex) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Database Error");
+                alert.setHeaderText(null);
+                alert.setContentText("An error occurred while inserting the order. Please try again.");
+                alert.showAndWait();
             } catch (IllegalArgumentException ex) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Input Error");
                 alert.setHeaderText(null);
-                alert.setContentText("Invalid date format. Please use YYYY-MM-DD.");
+                alert.setContentText("Invalid date format. Please use the date picker to select a date.");
                 alert.showAndWait();
             }
         });
@@ -846,6 +864,7 @@ public class Main extends Application
         insertOrdersStage.initModality(Modality.WINDOW_MODAL);
         insertOrdersStage.show();
     }
+
     private void showInsertPositionTypesWindow(Stage primaryStage) {
         Stage insertPositionTypesStage = new Stage();
         insertPositionTypesStage.setTitle("Insert Position Type");
@@ -1392,13 +1411,13 @@ public class Main extends Application
             int orderId = Integer.parseInt(orderIdField.getText());
             Integer clientId = clientIdField.getText().isEmpty() ? null : Integer.parseInt(clientIdField.getText());
             Integer couriersId = couriersIdField.getText().isEmpty() ? null : Integer.parseInt(couriersIdField.getText());
-            java.sql.Date datetime = datetimePicker.getValue() != null ? java.sql.Date.valueOf(datetimePicker.getValue()) : null;
+            java.sql.Date complDatetime = datetimePicker.getValue() != null ? java.sql.Date.valueOf(datetimePicker.getValue()) : null;
             String status = statusField.getText();
             Double price = priceField.getText().isEmpty() ? null : Double.parseDouble(priceField.getText());
 
             if (!orderIdField.getText().isEmpty()) {
                 try {
-                    dbFoodAPP.updateOrder(orderId, clientId, couriersId, datetime, status, price);
+                    dbFoodAPP.updateOrder(orderId, clientId, couriersId, complDatetime, status, price);
 
                     updateOrderStage.close();
                     orders.setAll(dbFoodAPP.getAllOrders());

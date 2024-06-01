@@ -130,7 +130,7 @@ public class dbManager
                 int client_id = resultSet.getInt("client_id");
                 int couriers_id = resultSet.getInt("couriers_id");
                 Date datetime = resultSet.getDate("datetime");
-                orders.Status status = orders.Status.valueOf(resultSet.getString("status").replace("_", " "));
+                orders.Status status = orders.Status.valueOf(resultSet.getString("status").replace(" ", "_"));
                 double price = resultSet.getDouble("price");
 
                 ordersList.add(new orders(order_id, client_id, couriers_id, datetime, status, price));
@@ -217,7 +217,7 @@ public class dbManager
         }
         statement.close();
     }
-    public void insertCourier(int courierId, int courierDocument, long phone, Status status, String name, String surname, String patronymics, String experience, TypeOfCourier typeOfCourier, double deliveryPrice) throws SQLException {
+    public void insertCourier(int courierId, int courierDocument, long phone, Status status, String name, String surname, String patronymics, String experience, String typeOfCourier, double deliveryPrice) throws SQLException {
         String sql = "INSERT INTO couriers (courier_id, courier_document, phone, status, name, surname, patronymics, expirience, type_of_courier, delivery_price) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         PreparedStatement statement = connection.prepareStatement(sql);
         statement.setInt(1, courierId);
@@ -267,7 +267,7 @@ public class dbManager
         statement.close();
     }
 
-    public void insertOrder(int orderId, int clientId, int courierId, Date datetime, String status, double price) throws SQLException {
+    public void insertOrder(int orderId, int clientId, int courierId, java.sql.Date datetime, String status, double price) throws SQLException {
         String sql = "INSERT INTO orders (order_id, client_id, couriers_id, datetime, status, price) VALUES (?, ?, ?, ?, ?, ?)";
         PreparedStatement statement = connection.prepareStatement(sql);
         statement.setInt(1, orderId);
