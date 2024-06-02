@@ -611,6 +611,7 @@ public class dbManager
         statement.close();
     }
 
+
     public void updatePositionType(int positionTypeId, String foodType) throws SQLException {
         String sql = "UPDATE position_types SET food_type = ? WHERE position_type_id = ?";
         PreparedStatement statement = connection.prepareStatement(sql);

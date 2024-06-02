@@ -5,23 +5,22 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-
-import java.awt.*;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.Date;
 import org.example.couriers.Status;
-import org.example.couriers.TypeOfCourier;
 public class Main extends Application
 {
     public dbManager dbFoodAPP;
@@ -62,7 +61,6 @@ public class Main extends Application
         reports = FXCollections.observableArrayList(dbFoodAPP.getAllReports());
         restaraunts = FXCollections.observableArrayList(dbFoodAPP.getAllRestaraunts());
 
-        //тут все необходимые кнопки
         RadioButton clientRadioButton = new RadioButton("Client");
         RadioButton couriersRadioButton = new RadioButton("Couriers");
         RadioButton menuRadioButton = new RadioButton("Menu");
@@ -79,8 +77,28 @@ public class Main extends Application
 
         CheckBox IsDelivered = new CheckBox("Is delivered?");
 
-        VBox root = new VBox();
+        HBox radioButtonHBox = new HBox(30);
+        radioButtonHBox.getChildren().addAll(
+                clientRadioButton,
+                couriersRadioButton,
+                menuRadioButton,
+                ordered_foodRadioButton,
+                ordersRadioButton,
+                position_typesRadioButton,
+                reportsRadioButton,
+                restarauntsRadioButton
+        );
 
+        HBox buttonHBox = new HBox(10);
+        buttonHBox.setAlignment(Pos.CENTER);
+        buttonHBox.getChildren().addAll(createButton, updateButton, deleteButton);
+
+        VBox root = new VBox(10);
+        root.getChildren().addAll(
+                radioButtonHBox,
+                buttonHBox,
+                IsDelivered
+        );
         Map<RadioButton, Runnable> createsMap = new HashMap<>();
         createsMap.put(clientRadioButton, () -> showInsertClientWindow(primaryStage));
         createsMap.put(couriersRadioButton, () -> showInsertCourierWindow(primaryStage));
@@ -270,7 +288,7 @@ public class Main extends Application
             }
         });
         //При создание новой кнопки вписывай сюда её название
-        root.getChildren().addAll(clientRadioButton,couriersRadioButton,menuRadioButton,ordered_foodRadioButton,ordersRadioButton,position_typesRadioButton,reportsRadioButton,restarauntsRadioButton,createButton,updateButton,deleteButton,IsDelivered);
+        // root.getChildren().addAll(clientRadioButton,couriersRadioButton,menuRadioButton,ordered_foodRadioButton,ordersRadioButton,position_typesRadioButton,reportsRadioButton,restarauntsRadioButton,createButton,updateButton,deleteButton,IsDelivered);
 
 
         Scene scene = new Scene(root, 800, 600);
@@ -549,7 +567,8 @@ public class Main extends Application
         insertClientStage.show();
 
     }
-    private void showInsertCourierWindow(Stage primaryStage) {
+    private void showInsertCourierWindow(Stage primaryStage)
+    {
     Stage insertCourierStage = new Stage();
     insertCourierStage.setTitle("Insert Courier");
 
@@ -821,7 +840,7 @@ public class Main extends Application
                 int clientId = Integer.parseInt(clientIdField.getText());
                 int couriersId = Integer.parseInt(couriersIdField.getText());
                 java.sql.Date complDatetime = datetimePicker.getValue() != null ? java.sql.Date.valueOf(datetimePicker.getValue()) : null;
-                String status = statusChoiceBox.getValue();
+                String status = statusChoiceBox.getValue().replace("_", " ");
                 double price = Double.parseDouble(priceField.getText());
 
                 if (complDatetime == null) {
@@ -1170,10 +1189,10 @@ public class Main extends Application
         gridPane.add(new Label("Phone:"), 0, 2);
         gridPane.add(phoneField, 1, 2);
 
-        TextField statusField = new TextField();
-        statusField.setPromptText("Enter status");
+        ComboBox<String> statusComboBox = new ComboBox<>();
+        statusComboBox.getItems().addAll("busy", "free", "delivering");
         gridPane.add(new Label("Status:"), 0, 3);
-        gridPane.add(statusField, 1, 3);
+        gridPane.add(statusComboBox, 1, 3);
 
         TextField nameField = new TextField();
         nameField.setPromptText("Enter name");
@@ -1195,10 +1214,10 @@ public class Main extends Application
         gridPane.add(new Label("Experience:"), 0, 7);
         gridPane.add(experienceField, 1, 7);
 
-        TextField typeOfCourierField = new TextField();
-        typeOfCourierField.setPromptText("Enter type of courier");
+        ComboBox<String> typeOfCourierComboBox = new ComboBox<>();
+        typeOfCourierComboBox.getItems().addAll("walking", "bicycling", "by car");
         gridPane.add(new Label("Type of Courier:"), 0, 8);
-        gridPane.add(typeOfCourierField, 1, 8);
+        gridPane.add(typeOfCourierComboBox, 1, 8);
 
         TextField deliveryPriceField = new TextField();
         deliveryPriceField.setPromptText("Enter delivery price");
@@ -1210,12 +1229,12 @@ public class Main extends Application
             int courierId = Integer.parseInt(courierIdField.getText());
             Integer courierDocument = courierDocumentField.getText().isEmpty() ? null : Integer.parseInt(courierDocumentField.getText());
             Long phone = phoneField.getText().isEmpty() ? null : Long.parseLong(phoneField.getText());
-            String status = statusField.getText();
+            String status = statusComboBox.getValue();
             String name = nameField.getText();
             String surname = surnameField.getText();
             String patronymics = patronymicsField.getText();
             String experience = experienceField.getText();
-            String typeOfCourier = typeOfCourierField.getText();
+            String typeOfCourier = typeOfCourierComboBox.getValue();
             Double deliveryPrice = deliveryPriceField.getText().isEmpty() ? null : Double.parseDouble(deliveryPriceField.getText());
 
             if (!courierIdField.getText().isEmpty()) {
@@ -1242,6 +1261,7 @@ public class Main extends Application
         updateCourierStage.initModality(Modality.WINDOW_MODAL);
         updateCourierStage.show();
     }
+
     private void showUpdateMenuWindow(Stage primaryStage) {
         Stage updateMenuStage = new Stage();
         updateMenuStage.setTitle("Update Menu Item");
@@ -1396,10 +1416,10 @@ public class Main extends Application
         gridPane.add(new Label("Date:"), 0, 3);
         gridPane.add(datetimePicker, 1, 3);
 
-        TextField statusField = new TextField();
-        statusField.setPromptText("Enter Status");
+        ChoiceBox<String> statusChoiceBox = new ChoiceBox<>();
+        statusChoiceBox.getItems().addAll("created", "delivery", "in_progress", "delivered");
         gridPane.add(new Label("Status:"), 0, 4);
-        gridPane.add(statusField, 1, 4);
+        gridPane.add(statusChoiceBox, 1, 4);
 
         TextField priceField = new TextField();
         priceField.setPromptText("Enter Price");
@@ -1408,30 +1428,47 @@ public class Main extends Application
 
         Button updateButton = new Button("Update");
         updateButton.setOnAction(e -> {
-            int orderId = Integer.parseInt(orderIdField.getText());
-            Integer clientId = clientIdField.getText().isEmpty() ? null : Integer.parseInt(clientIdField.getText());
-            Integer couriersId = couriersIdField.getText().isEmpty() ? null : Integer.parseInt(couriersIdField.getText());
-            java.sql.Date complDatetime = datetimePicker.getValue() != null ? java.sql.Date.valueOf(datetimePicker.getValue()) : null;
-            String status = statusField.getText();
-            Double price = priceField.getText().isEmpty() ? null : Double.parseDouble(priceField.getText());
-
-            if (!orderIdField.getText().isEmpty()) {
-                try {
-                    dbFoodAPP.updateOrder(orderId, clientId, couriersId, complDatetime, status, price);
-
-                    updateOrderStage.close();
-                    orders.setAll(dbFoodAPP.getAllOrders());
-                } catch (NumberFormatException ex) {
-                    System.out.println(ex.getMessage());
-                } catch (SQLException ex) {
-                    System.out.println(ex.getMessage());
+            try {
+                if (orderIdField.getText().isEmpty()) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Input Error");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Please enter the Order ID.");
+                    alert.showAndWait();
+                    return;
                 }
-            } else {
+
+                int orderId = Integer.parseInt(orderIdField.getText());
+                Integer clientId = clientIdField.getText().isEmpty() ? null : Integer.parseInt(clientIdField.getText());
+                Integer couriersId = couriersIdField.getText().isEmpty() ? null : Integer.parseInt(couriersIdField.getText());
+                java.sql.Date complDatetime = datetimePicker.getValue() != null ? java.sql.Date.valueOf(datetimePicker.getValue()) : null;
+                String status = statusChoiceBox.getValue().replace("_", " ");
+                Double price = priceField.getText().isEmpty() ? null : Double.parseDouble(priceField.getText());
+
+                dbFoodAPP.updateOrder(orderId, clientId, couriersId, complDatetime, status, price);
+                orders.setAll(dbFoodAPP.getAllOrders());
+                updateOrderStage.close();
+            } catch (NumberFormatException ex) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Input Error");
                 alert.setHeaderText(null);
-                alert.setContentText("Please enter the Order ID.");
+                alert.setContentText("Please ensure all numerical fields contain valid numbers.");
                 alert.showAndWait();
+                ex.printStackTrace();
+            } catch (SQLException ex) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Database Error");
+                alert.setHeaderText(null);
+                alert.setContentText("An error occurred while updating the order. Please try again.");
+                alert.showAndWait();
+                ex.printStackTrace();
+            } catch (IllegalArgumentException ex) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Input Error");
+                alert.setHeaderText(null);
+                alert.setContentText("Invalid date format. Please use the date picker to select a date.");
+                alert.showAndWait();
+                ex.printStackTrace();
             }
         });
         gridPane.add(updateButton, 1, 6);
@@ -1442,6 +1479,7 @@ public class Main extends Application
         updateOrderStage.initModality(Modality.WINDOW_MODAL);
         updateOrderStage.show();
     }
+
     private void showUpdatePositionTypeWindow(Stage primaryStage) {
         Stage updatePositionTypeStage = new Stage();
         updatePositionTypeStage.setTitle("Update Position Type");
@@ -1820,7 +1858,14 @@ public class Main extends Application
         alert.setContentText("First select the table, then click the “Update” button and enter the necessary data to update.");
         alert.showAndWait();
     }
-
+    private  void ChooseOnlyOneButton()
+    {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Choose only one button");
+        alert.setHeaderText(null);
+        alert.setContentText("Choose only one button when you want to “create“ or “update“ and “delete“ something in table.");
+        alert.showAndWait();
+    }
     public static void main(String[] args)
     {
     launch(args);
